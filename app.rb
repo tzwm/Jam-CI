@@ -45,11 +45,14 @@ class MyApp < Sinatra::Base
     end 
 
     @@running = @@builds_arr.shift
-    output = pull_the_repo 
+    ret, output = pull_the_repo 
     `cd #{@@running["build_id"]}`
-    output += bundle_install 
-    output += run_test
+    ret, output_tmp = bundle_install
+    output += output_tmp
+    ret, output_tmp = run_test
+    output += output_tmp
     print_output output
+    @@running = nil
     if !@@builds_err.empty?
       process
     end 
@@ -58,22 +61,28 @@ class MyApp < Sinatra::Base
   def pull_the_repo 
     output = `git clone #{@@running["repository"]["url"]} #{@@running["build_id"]}`
     if !$?.success?
-      return false
+      return false, output
     end
+    
+    return true, output
   end
 
-  def bundle_install repo_url
+  def bundle_install
     output = `bundle install --local --path .bundle || gem install debugger-ruby_core_source --install-dir ./.bundle/ruby/1.9.1 && bundle install --local --path .bundle`
     if !$?.success?
-      return false
+      return false, output
     end
+
+    return true, output
   end
 
   def run_test
     output = `./script/run_test_parallel`
     if !$?.success?
-      return false
+      return false, output
     end
+
+    return true, output
   end
 
 
