@@ -45,25 +45,33 @@ class MyApp < Sinatra::Base
     end 
 
     @@running = @@builds_arr.shift
+    `cd #{File.dirname __FILE__}`
     ret, output = pull_the_repo 
-    `cd #{@@running["build_id"]}`
     ret, output_tmp = bundle_install
     output += output_tmp
     ret, output_tmp = run_test
     output += output_tmp
     print_output output
+    `cd #{File.dirname __FILE__}`
     @@running = nil
+
     if !@@builds_err.empty?
       process
     end 
   end
 
   def pull_the_repo 
-    output = `git clone #{@@running["repository"]["url"]} #{@@running["build_id"]}`
+    output = `git clone #{@@running["repository"]["url"]} builds/#{@@running["build_id"]}`
     if !$?.success?
       return false, output
     end
-    
+
+    `cd builds/#{@@running["build_id"]}`
+    output = `git checkout #{@@running["head_commit"]["id"]}`
+    if !$?.success?
+      return false, output
+    end
+
     return true, output
   end
 
@@ -77,7 +85,7 @@ class MyApp < Sinatra::Base
   end
 
   def run_test
-    output = `./script/run_test_parallel`
+    output = `./scripts/run_test_parallel`
     if !$?.success?
       return false, output
     end
