@@ -1,2 +1,6 @@
-builds
 .bundle
+
+data/config/*
+!data/config/sample.yml
+
+data/jobs

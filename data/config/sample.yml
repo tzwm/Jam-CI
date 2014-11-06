@@ -1,0 +1,4 @@
+name: Jam-CI # Project Name
+url: https://github.com/tzwm/Jam-CI # Repository URL
+branch: master # Branch specified
+push_pull: push # To use push or pull to get new commit, recommend to push
