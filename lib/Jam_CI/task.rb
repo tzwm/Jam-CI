@@ -1,15 +1,17 @@
 class Task
-  @output = "Begin"
+  @output = "====Begin====\n"
 
-  def initialize(params)
-
+  def initialize(payload)
+    @url = payload["repository"]["url"]
+    @branch = payload["ref"].split(/refs\/heads\//).last
+    @commits = payload["commits"]
+    @head_commit = payload["head_commit"]
   end
 
-  def pull_repo
-    
+  def run
   end
 
-  def run_test
+  def enterDir
 
-  end
+  end 
 end
